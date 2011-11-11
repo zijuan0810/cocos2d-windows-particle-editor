@@ -15,5 +15,10 @@ namespace ParticleEditor
         {
             InitializeComponent();
         }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start("iexplore.exe", "https://code.google.com/p/cocos2d-windows-particle-editor/");
+        }
     }
 }
