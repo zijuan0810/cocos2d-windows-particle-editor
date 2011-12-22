@@ -252,6 +252,11 @@ namespace ParticleEditor
                     WriteFloat(writer, "finishColorVarianceGreen", EndColorVar.G / 255.0f);
                     WriteFloat(writer, "finishColorVarianceRed", EndColorVar.R / 255.0f);
 
+                    WriteFloat(writer, "rotationStart", StartSpin);
+                    WriteFloat(writer, "rotationStartVariance", StartSpinVar);
+                    WriteFloat(writer, "rotationEnd", EndSpin);
+                    WriteFloat(writer, "rotationEndVariance", EndSpinVar);
+
                     WriteFloat(writer, "finishParticleSize", EndSize);
                     WriteFloat(writer, "finishParticleSizeVariance", EndSizeVar);
 
@@ -353,6 +358,12 @@ namespace ParticleEditor
                     g = (byte)(int)(ReadFloat(dict, "finishColorVarianceGreen") * 255.0f);
                     r = (byte)(int)(ReadFloat(dict, "finishColorVarianceRed") * 255.0f);
                     EndColorVar = Color.FromArgb(a, r, g, b);
+
+                    StartSpin = ReadFloat(dict, "rotationStart");
+                    StartSpinVar = ReadFloat(dict, "rotationStartVariance");
+                    EndSpin = ReadFloat(dict, "rotationEnd");
+                    EndSpinVar = ReadFloat(dict, "rotationEndVariance");
+
 
                     EndSize = ReadFloat(dict, "finishParticleSize");
                     EndSizeVar = ReadFloat(dict, "finishParticleSizeVariance");
