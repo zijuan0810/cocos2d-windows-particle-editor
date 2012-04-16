@@ -130,6 +130,8 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 		}
 	}
 
+	mEmiiter->setTexture(CCTextureCache::sharedTextureCache()->addImage(texturePath));
+
 	mEmiiter->setAngle(angle);
 	mEmiiter->setAngleVar(angleVar);
 
@@ -200,7 +202,7 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 	mEmiiter->setStartSize(startSize);
 	mEmiiter->setStartSizeVar(startSizeVar);
 
-	mEmiiter->setTexture(CCTextureCache::sharedTextureCache()->addImage(texturePath));
+	
 	mEmiiter->setTotalParticles(totalParticles);
 
 	mEmiiter->resetSystem();
