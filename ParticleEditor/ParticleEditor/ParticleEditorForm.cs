@@ -18,14 +18,14 @@ namespace ParticleEditor
         public delegate bool MGameLoop(float interval);
 
 
-        public delegate bool MParticleChanged(float scale, bool isBackgroundMove, bool isQuad, float angle, float angleVar, int destBlendFunc, int srcBlendFunc, float duration, float emissionRate, int emiiterMode,
+        public delegate bool MParticleChanged(float scale, bool isBackgroundMove, float angle, float angleVar, int destBlendFunc, int srcBlendFunc, float duration, float emissionRate, int emiiterMode,
         byte endColorR, byte endColorG, byte endColorB, byte endColorA,
         byte endColorVarR, byte endColorVarG, byte endColorVarB, byte endColorVarA,
         float endRadius, float endRadiusVar,
         float endSize, float endSizeVar,
         float endSpin, float endSpinVar,
         float gravityX, float gravityY,
-        bool isAutoRemoveOnFinish, bool isBlendAdditive,
+        bool isAutoRemoveOnFinish,
         float life, float lifeVar,
         int positionType,
         float positionVarX, float positionVarY,
@@ -39,7 +39,7 @@ namespace ParticleEditor
         float startSize, float startSizeVar,
         float startSpin, float startSpinVar,
         float tangentialAccel, float tangentialAccelVar,
-        string texturePath,
+        string texturePath, string textureImageData,
         uint totalParticles
         );
 
@@ -86,7 +86,7 @@ namespace ParticleEditor
             mIsBackgroundMove = mParticleSystem.IsBackgroundMove;
             mPlayToolStripButton.Enabled = !mParticleSystem.IsLoop;
 
-            mDll.Invoke<MParticleChanged, bool>(mParticleSystem.Scale,mParticleSystem.IsBackgroundMove, mParticleSystem.IsQuad, mParticleSystem.Angle, mParticleSystem.AngleVar, (int)mParticleSystem.DestBlendFunc, (int)mParticleSystem.SrcBlendFunc,
+            mDll.Invoke<MParticleChanged, bool>(mParticleSystem.Scale,mParticleSystem.IsBackgroundMove, mParticleSystem.Angle, mParticleSystem.AngleVar, (int)mParticleSystem.DestBlendFunc, (int)mParticleSystem.SrcBlendFunc,
                 mParticleSystem.Duration, mParticleSystem.EmissionRate, (int)mParticleSystem.Mode,
                 mParticleSystem.EndColor.R, mParticleSystem.EndColor.G, mParticleSystem.EndColor.B, mParticleSystem.EndColor.A,
                 mParticleSystem.EndColorVar.R, mParticleSystem.EndColorVar.G, mParticleSystem.EndColorVar.B, mParticleSystem.EndColorVar.A,
@@ -94,7 +94,7 @@ namespace ParticleEditor
                 mParticleSystem.EndSize, mParticleSystem.EndSizeVar,
                 mParticleSystem.EndSpin, mParticleSystem.EndSpinVar,
                 mParticleSystem.GravityX, mParticleSystem.GravityY,
-                mParticleSystem.IsAutoRemoveOnFinish, mParticleSystem.IsBlendAdditive,
+                mParticleSystem.IsAutoRemoveOnFinish, 
                 mParticleSystem.Life, mParticleSystem.LifeVar,
                 (int)mParticleSystem.PositionType,
                 mParticleSystem.PosVarX, mParticleSystem.PosVarY,
@@ -108,7 +108,7 @@ namespace ParticleEditor
                 mParticleSystem.StartSize, mParticleSystem.StartSizeVar,
                 mParticleSystem.StartSpin, mParticleSystem.StartSpinVar,
                 mParticleSystem.TangentialAccel, mParticleSystem.TangentialAccelVar,
-                mParticleSystem.TexturePath,
+                mParticleSystem.TexturePath,mParticleSystem.TextureImageData,
                 mParticleSystem.TotalParticles
                 );
 

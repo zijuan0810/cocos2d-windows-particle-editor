@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace ParticleEditor
 {
@@ -57,16 +59,21 @@ namespace ParticleEditor
         public ParticleSystem()
         {
             TexturePath = String.Empty;
-            IsQuad = true;
             IsBackgroundMove = true;
             Scale = 1.0f;
-            DestBlendFunc = BlendFunc.GL_SRC_ALPHA;
+
+            DestBlendFunc = BlendFunc.GL_ONE_MINUS_SRC_ALPHA;
+            SrcBlendFunc = BlendFunc.GL_SRC_ALPHA;
             Duration = -1;
+            IsSaveTextureImageData = false;
+            TextureImageData = string.Empty;
         }
 
         public bool IsLoop { get { return Math.Abs(Duration - -1) < 0.001; } }
 
-        public bool IsQuad;
+        
+
+
 
         [CategoryAttribute("重力模式"), DescriptionAttribute("重力X，只在重力模式下起作用")]
         public float GravityX { get; set; }
@@ -185,14 +192,14 @@ namespace ParticleEditor
         [CategoryAttribute("纹理渲染"), DescriptionAttribute("纹理路径，目前只可为Debug.win32目录下文件名")]
         public string TexturePath { get; set; }
 
+        [CategoryAttribute("纹理渲染"), DescriptionAttribute("纹理数据")]
+        public string TextureImageData { get; set; }
+
         [CategoryAttribute("纹理渲染"), DescriptionAttribute("源纹理混合")]
         public BlendFunc SrcBlendFunc { get; set; }
 
         [CategoryAttribute("纹理渲染"), DescriptionAttribute("目的纹理混合")]
         public BlendFunc DestBlendFunc { get; set; }
-
-        [CategoryAttribute("纹理渲染"), DescriptionAttribute("是否开启纹理混合")]
-        public bool IsBlendAdditive { get; set; }
 
         [CategoryAttribute("位置"), DescriptionAttribute("粒子位置类型")]
         public PositionType PositionType { get; set; }
@@ -208,6 +215,9 @@ namespace ParticleEditor
 
         [CategoryAttribute("编辑器"), DescriptionAttribute("画布缩放大小")]
         public float Scale { get; set; }
+
+        [CategoryAttribute("编辑器"), DescriptionAttribute("是否把图片数据编码到文件里导出")]
+        public bool IsSaveTextureImageData { get; set; }
 
         protected Color ToColor(float r, float g, float b, float a)
         {
@@ -231,7 +241,6 @@ namespace ParticleEditor
 
                     WriteFloat(writer, "angle", Angle);
                     WriteFloat(writer, "angleVariance", AngleVar);
-                    WriteFloat(writer, "blendAdditive", IsBlendAdditive ? 1.0f : 0.0f);
 
 
                     WriteInt(writer, "blendFuncDestination", (int)DestBlendFunc);
@@ -311,6 +320,29 @@ namespace ParticleEditor
 
                     WriteString(writer, "textureFileName", TexturePath);
 
+                    if (IsSaveTextureImageData)
+                    {
+                        if (string.IsNullOrEmpty(TextureImageData))
+                        {
+                            if (File.Exists(TexturePath))
+                            {
+                                var data=File.ReadAllBytes(TexturePath);
+                                MemoryStream ms=new MemoryStream();
+                                DeflaterOutputStream outputStream = new DeflaterOutputStream(ms);
+                                outputStream.Write(data,0,data.Length);
+                                outputStream.Close();
+                                data = ms.ToArray();
+
+                                TextureImageData = Convert.ToBase64String(data);
+                            }
+                        }
+
+                        if (TextureImageData.Length > 0)
+                        {
+                            WriteString(writer, "textureImageData", TextureImageData);
+                        }
+                    }
+
                     writer.WriteEndElement();
                 }
                 
@@ -336,7 +368,6 @@ namespace ParticleEditor
 
                     Angle = ReadFloat(dict, "angle");
                     AngleVar = ReadFloat(dict, "angleVariance");
-                    IsBlendAdditive = ReadFloat(dict, "blendAdditive") > 0.0f;
 
 
                     DestBlendFunc = (BlendFunc)ReadInt(dict, "blendFuncDestination");
@@ -416,6 +447,9 @@ namespace ParticleEditor
                     TexturePath = ReadString(dict, "textureFileName");
 
                     EmissionRate = ReadFloat(dict, "emissionRate");
+
+                    TextureImageData = ReadString(dict, "textureImageData");
+
                     if (EmissionRate == 0)
                     {
                         EmissionRate = TotalParticles / Life;

@@ -57,9 +57,9 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(101, 45);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 13);
+            this.label3.Size = new System.Drawing.Size(71, 13);
             this.label3.TabIndex = 2;
-            this.label3.Text = "fjz1046@gmail.com";
+            this.label3.Text = "fjz13@live.cn";
             // 
             // linkLabel1
             // 

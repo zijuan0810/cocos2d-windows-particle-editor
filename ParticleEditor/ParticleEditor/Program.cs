@@ -13,17 +13,10 @@ namespace ParticleEditor
         [STAThread]
         static void Main()
         {
-            try
-            {
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new ParticleEditorForm());
-            }
-            catch (System.Exception ex)
-            {
-                string a = ex.Message;
-            }
-          
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new ParticleEditorForm());
+
         }
     }
 }

@@ -9,17 +9,29 @@ extern "C"
 {
 	MEDUSA_EXPORT_API bool MInitializeApplication( HWND hwnd )
 	{
+
 		cocos2d::CCEGLView::SetParentHwnd(hwnd);
 
+		// create the application instance
 		AppDelegate app;
 
-		cocos2d::CCApplication::sharedApplication().run();
+
+		CCEGLView* eglView = CCEGLView::sharedOpenGLView();
+		eglView->setViewName("HelloCpp");
+		eglView->setFrameSize(1024, 768);
+		// The resolution of ipad3 is very large. In general, PC's resolution is smaller than it.
+		// So we need to invoke 'setFrameZoomFactor'(only valid on desktop(win32, mac, linux)) to make the window smaller.
+		eglView->setFrameZoomFactor(1.f);
+
+
+		CCApplication::sharedApplication()->run();
 		return true;
 	}
 
 
 	MEDUSA_EXPORT_API bool MGameCleanUp()
 	{
+
 		cocos2d::CCEGLView::Destroy();
 
 		cocos2d::CCDirector::sharedDirector()->end();
@@ -35,14 +47,14 @@ extern "C"
 	}
 
 
-	MEDUSA_EXPORT_API bool MParticleChanged(float scale,bool isBackgroundMove,bool isQuad,float angle,float angleVar,int destBlendFunc,int srcBlendFunc,float duration,float emissionRate,int emiiterMode,
+	MEDUSA_EXPORT_API bool MParticleChanged(float scale,bool isBackgroundMove,float angle,float angleVar,int destBlendFunc,int srcBlendFunc,float duration,float emissionRate,int emiiterMode,
 		GLbyte endColorR,GLbyte endColorG,GLbyte endColorB,GLbyte endColorA,
 		GLbyte endColorVarR,GLbyte endColorVarG,GLbyte endColorVarB,GLbyte endColorVarA,
 		float endRadius,float endRadiusVar,
 		float endSize,float endSizeVar,
 		float endSpin,float endSpinVar,
 		float gravityX,float gravityY,
-		bool isAutoRemoveOnFinish,bool isBlendAdditive,
+		bool isAutoRemoveOnFinish,
 		float life,float lifeVar,
 		int positionType,
 		float positionVarX,float positionVarY,
@@ -56,18 +68,18 @@ extern "C"
 		float startSize,float startSizeVar,
 		float startSpin,float startSpinVar,
 		float tangentialAccel,float tangentialAccelVar,
-		char* texturePath,
+		char* texturePath,char* textureImageData,
 		unsigned int totalParticles
 		)
 	{
-		HelloWorld::ChangeParticle(scale, isBackgroundMove,isQuad,angle,angleVar,destBlendFunc,srcBlendFunc,duration,emissionRate,emiiterMode,
+		HelloWorld::ChangeParticle(scale, isBackgroundMove,angle,angleVar,destBlendFunc,srcBlendFunc,duration,emissionRate,emiiterMode,
 			endColorR,endColorG,endColorB,endColorA,
 			endColorVarR,endColorVarG,endColorVarB,endColorVarA,
 			endRadius,endRadiusVar,
 			endSize,endSizeVar,
 			endSpin,endSpinVar,
 			gravityX,gravityY,
-			isAutoRemoveOnFinish,isBlendAdditive,
+			isAutoRemoveOnFinish,
 			life,lifeVar,
 			positionType,
 			positionVarX,positionVarY,
@@ -78,7 +90,7 @@ extern "C"
 			startColorR,startColorG,startColorB,startColorA,
 			startColorVarR,startColorVarG,startColorVarB,startColorVarA,
 			startRadius,startRadiusVar,startSize,startSizeVar,
-			startSpin,startSpinVar,tangentialAccel,tangentialAccelVar,texturePath,totalParticles);
+			startSpin,startSpinVar,tangentialAccel,tangentialAccelVar,texturePath,textureImageData,totalParticles);
 		return true;
 	}
 }
