@@ -55,7 +55,6 @@ namespace ParticleEditor.Samples
             EndColorVar = ToColor(0.5f, 0.5f, 0.5f, 0.0f);
 
 
-            IsBlendAdditive = false;
 
             // additive
 

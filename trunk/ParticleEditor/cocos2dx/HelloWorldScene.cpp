@@ -1,14 +1,17 @@
 #include "HelloWorldScene.h"
+#include "AppMacros.h"
+#include "support/zip_support/ZipUtils.h"
+#include "support/base64.h"
 
 USING_NS_CC;
 
 CCScene* HelloWorld::scene()
 {
 	// 'scene' is an autorelease object
-	CCScene *scene = CCScene::node();
+	CCScene *scene = CCScene::create();
 
 	// 'layer' is an autorelease object
-	HelloWorld *layer = HelloWorld::node();
+	HelloWorld *layer = HelloWorld::create();
 
 	// add layer as a child to scene
 	scene->addChild(layer);
@@ -29,18 +32,18 @@ bool HelloWorld::init()
 
 	CCSize size= CCDirector::sharedDirector()->getWinSize();
 
-	mBackground=CCSprite::spriteWithFile("background.png");
+	mBackground=CCSprite::create("background.png");
 	mBackground->setAnchorPoint(ccp(0.5f,0.5f));
 	mBackground->setPosition(ccp(size.width/2,size.height/2));
 
 	this->addChild(mBackground,1,1);
-	CCActionInterval* move1 = CCMoveBy::actionWithDuration(4, CCPointMake(100,0) );
-	CCActionInterval* move2 = CCMoveBy::actionWithDuration(4, CCPointMake(0,100) );
-	CCActionInterval* move3 = CCMoveBy::actionWithDuration(4, CCPointMake(-100,0) );
-	CCActionInterval* move4 = CCMoveBy::actionWithDuration(4, CCPointMake(0,-100) );
+	CCActionInterval* move1 = CCMoveBy::create(4, CCPointMake(100,0) );
+	CCActionInterval* move2 = CCMoveBy::create(4, CCPointMake(0,100) );
+	CCActionInterval* move3 = CCMoveBy::create(4, CCPointMake(-100,0) );
+	CCActionInterval* move4 = CCMoveBy::create(4, CCPointMake(0,-100) );
 
-	CCFiniteTimeAction* seq = CCSequence::actions( move1, move2, move3,move4,NULL);
-	mBackground->runAction( CCRepeatForever::actionWithAction((CCActionInterval*)seq) );
+	CCFiniteTimeAction* seq = CCSequence::create(move1, move2, move3,move4,NULL);
+	mBackground->runAction( CCRepeatForever::create((CCActionInterval*)seq) );
 
 	mEmiiter=new CCParticleSun();
 
@@ -55,14 +58,14 @@ bool HelloWorld::init()
 	return true;
 }
 
-void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,float angle,float angleVar,int destBlendFunc,int srcBlendFunc,float duration,float emissionRate,int emiiterMode,
+void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,float angle,float angleVar,int destBlendFunc,int srcBlendFunc,float duration,float emissionRate,int emiiterMode,
 	GLbyte endColorR,GLbyte endColorG,GLbyte endColorB,GLbyte endColorA,
 	GLbyte endColorVarR,GLbyte endColorVarG,GLbyte endColorVarB,GLbyte endColorVarA,
 	float endRadius,float endRadiusVar,
 	float endSize,float endSizeVar,
 	float endSpin,float endSpinVar,
 	float gravityX,float gravityY,
-	bool isAutoRemoveOnFinish,bool isBlendAdditive,
+	bool isAutoRemoveOnFinish,
 	float life,float lifeVar,
 	int positionType,
 	float positionVarX,float positionVarY,
@@ -76,7 +79,7 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 	float startSize,float startSizeVar,
 	float startSpin,float startSpinVar,
 	float tangentialAccel,float tangentialAccelVar,
-	char* texturePath,
+	char* texturePath,char* textureImageData,
 	unsigned int totalParticles
 	)
 {
@@ -94,14 +97,8 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 	{
 		mEmiiter->removeFromParentAndCleanup(true);
 
-		if (isQuad)
-		{
-			mEmiiter=new CCParticleSystemQuad();
-		}
-		else
-		{
-			mEmiiter=new CCParticleSystemPoint();
-		}
+		mEmiiter=new CCParticleSystemQuad();
+
 		mEmiiter->initWithTotalParticles(totalParticles);
 		mEmiiter->setPosition(ccp(size.width/2,size.height/2));
 
@@ -120,20 +117,69 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 
 		if (mIsBackgroundMove)
 		{
-			CCActionInterval* move1 = CCMoveBy::actionWithDuration(4, CCPointMake(100,0) );
-			CCActionInterval* move2 = CCMoveBy::actionWithDuration(4, CCPointMake(0,100) );
-			CCActionInterval* move3 = CCMoveBy::actionWithDuration(4, CCPointMake(-100,0) );
-			CCActionInterval* move4 = CCMoveBy::actionWithDuration(4, CCPointMake(0,-100) );
+			CCActionInterval* move1 = CCMoveBy::create(4, CCPointMake(100,0) );
+			CCActionInterval* move2 = CCMoveBy::create(4, CCPointMake(0,100) );
+			CCActionInterval* move3 = CCMoveBy::create(4, CCPointMake(-100,0) );
+			CCActionInterval* move4 = CCMoveBy::create(4, CCPointMake(0,-100) );
 
-			CCFiniteTimeAction* seq = CCSequence::actions( move1, move2, move3,move4,NULL);
-			mBackground->runAction( CCRepeatForever::actionWithAction((CCActionInterval*)seq) );
+			CCFiniteTimeAction* seq = CCSequence::create(move1, move2, move3,move4,NULL);
+			mBackground->runAction( CCRepeatForever::create((CCActionInterval*)seq) );
 		}
 	}
 
-	mEmiiter->setTexture(CCTextureCache::sharedTextureCache()->addImage(texturePath));
+	CCTexture2D *tex = NULL;
+
+	if (texturePath!=NULL)
+	{
+		// set not pop-up message box when load image failed
+		bool bNotify = CCFileUtils::sharedFileUtils()->isPopupNotify();
+		CCFileUtils::sharedFileUtils()->setPopupNotify(false);
+		tex = CCTextureCache::sharedTextureCache()->addImage(texturePath);
+		// reset the value of UIImage notify
+		CCFileUtils::sharedFileUtils()->setPopupNotify(bNotify);
+	}
+
+	if (tex)
+	{
+		mEmiiter->setTexture(tex);
+	}
+	else
+	{                        
+		
+		unsigned char *buffer = NULL;
+		unsigned char *deflated = NULL;
+		CCImage *image = NULL;
+
+		CCAssert(textureImageData, "");
+
+		int dataLen = strlen(textureImageData);
+		if(dataLen != 0)
+		{
+			// if it fails, try to get it from the base64-gzipped data    
+			int decodeLen = base64Decode((unsigned char*)textureImageData, (unsigned int)dataLen, &buffer);
+			CCAssert( buffer != NULL, "CCParticleSystem: error decoding textureImageData");
+
+
+			int deflatedLen = ZipUtils::ccInflateMemory(buffer, decodeLen, &deflated);
+			CCAssert( deflated != NULL, "CCParticleSystem: error ungzipping textureImageData");
+
+			// For android, we should retain it in VolatileTexture::addCCImage which invoked in CCTextureCache::sharedTextureCache()->addUIImage()
+			image = new CCImage();
+			bool isOK = image->initWithImageData(deflated, deflatedLen);
+			CCAssert(isOK, "CCParticleSystem: error init image with Data");
+
+			mEmiiter->setTexture(CCTextureCache::sharedTextureCache()->addUIImage(image, texturePath));
+
+			image->release();
+		}
+
+		CC_SAFE_DELETE_ARRAY(buffer);
+		CC_SAFE_DELETE_ARRAY(deflated);
+	}
 
 	mEmiiter->setAngle(angle);
 	mEmiiter->setAngleVar(angleVar);
+
 
 	ccBlendFunc func;
 	func.dst=destBlendFunc;
@@ -183,8 +229,7 @@ void HelloWorld::ChangeParticle(float scale,bool isBackgroundMove,bool isQuad,fl
 	mEmiiter->setEndSpin(endSpin);
 	mEmiiter->setEndSpinVar(endSpinVar);
 
-	mEmiiter->setIsAutoRemoveOnFinish(isAutoRemoveOnFinish);
-	mEmiiter->setIsBlendAdditive(isBlendAdditive);
+	mEmiiter->setAutoRemoveOnFinish(isAutoRemoveOnFinish);
 
 	mEmiiter->setLife(life);
 	mEmiiter->setLifeVar(lifeVar);
